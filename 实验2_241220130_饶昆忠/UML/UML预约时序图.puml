@@ -1,0 +1,37 @@
+@startuml
+title UML时序图：预约提交与冲突处理
+skinparam shadowing false
+skinparam defaultFontName PingFang SC
+actor 买家
+participant "Web 前端" as UI
+participant "API / 鉴权" as API
+participant "预约服务" as Booking
+database "关系数据库" as DB
+participant "通知服务" as Notice
+买家 -> UI : 点击预约（带请求编号、商品版本）
+UI -> API : POST /reservations
+API -> Booking : 已认证账号 + 请求内容
+Booking -> DB : 查询 (账号, 请求编号)
+alt 编号已存在且摘要相同
+  DB --> Booking : 首次结果
+  Booking --> UI : 返回首次结果
+else 编号已存在但摘要不同
+  Booking --> UI : 409 编号冲突
+else 新请求
+  Booking -> DB : 开启事务；锁定商品与有效预约
+  alt 商品仍已发布且非自己的商品
+    Booking -> DB : 写预约 + 商品转已预约 + 请求回执
+    DB --> Booking : 提交成功
+    Booking --> UI : 预约成功 / 待卖家确认
+    Booking -> Notice : 提交后生成卖家消息（事件去重）
+  else 状态或版本已变 / 已有有效预约
+    Booking -> DB : 回滚并读取当前状态
+    Booking --> UI : 拒绝并显示当前状态
+  end
+end
+UI --> 买家 : 展示结果
+note bottom
+  同一商品的并发请求只有一个事务能创建有效预约。
+  通知失败可重试，不回滚已提交的预约。
+end note
+@enduml

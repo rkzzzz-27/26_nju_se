@@ -1,0 +1,51 @@
+@startuml
+title UML用例图：角色与主要功能
+left to right direction
+skinparam shadowing false
+skinparam defaultFontName PingFang SC
+skinparam usecase {
+  BackgroundColor #EEF5FF
+  BorderColor #5578AA
+}
+actor 游客 as Guest
+actor 学生 as Student
+actor 管理员 as Admin
+rectangle "校园二手交易系统" {
+  usecase "浏览与筛选商品" as UC1
+  usecase "学校邮箱注册 / 登录" as UC2
+  usecase "创建草稿 / 提交审核" as UC3
+  usecase "管理本人商品" as UC4
+  usecase "预约商品" as UC5
+  usecase "确认 / 拒绝预约" as UC6
+  usecase "取消预约" as UC7
+  usecase "确认线下交付完成" as UC8
+  usecase "查看通知与联系方式" as UC9
+  usecase "举报商品" as UC10
+  usecase "审核商品" as UC11
+  usecase "处理举报" as UC12
+  usecase "查询统计与日志" as UC13
+}
+Guest --> UC1
+Student --> UC1
+Student --> UC2
+Student --> UC3
+Student --> UC4
+Student --> UC5
+Student --> UC6
+Student --> UC7
+Student --> UC8
+Student --> UC9
+Student --> UC10
+Admin --> UC2
+Admin --> UC11
+Admin --> UC12
+Admin --> UC13
+note bottom of UC5
+  学生不能预约自己的商品；
+  每件商品同时只接受一条有效预约。
+end note
+note bottom of UC8
+  只有对应买家可确认完成，
+  且必须二次确认。
+end note
+@enduml
