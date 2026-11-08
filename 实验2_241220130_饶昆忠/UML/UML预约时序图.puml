@@ -1,4 +1,6 @@
 @startuml
+!pragma layout smetana
+skinparam dpi 220
 title UML时序图：预约提交与冲突处理
 skinparam shadowing false
 skinparam defaultFontName PingFang SC

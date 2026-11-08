@@ -1,4 +1,6 @@
 @startuml
+!pragma layout smetana
+skinparam dpi 220
 title UML用例图：角色与主要功能
 left to right direction
 skinparam shadowing false

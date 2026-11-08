@@ -1,4 +1,6 @@
 @startuml
+!pragma layout smetana
+skinparam dpi 220
 title UML组件图：校园二手交易系统
 left to right direction
 skinparam componentStyle rectangle

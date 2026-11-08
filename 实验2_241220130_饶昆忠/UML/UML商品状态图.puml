@@ -1,4 +1,6 @@
 @startuml
+!pragma layout smetana
+skinparam dpi 220
 title UML状态图：商品生命周期
 skinparam shadowing false
 skinparam defaultFontName PingFang SC
