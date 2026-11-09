@@ -1,0 +1,52 @@
+@startuml
+!pragma layout smetana
+skinparam dpi 220
+title UML组件图：校园二手交易系统
+left to right direction
+skinparam componentStyle rectangle
+skinparam shadowing false
+skinparam defaultFontName PingFang SC
+skinparam component {
+  BackgroundColor #EAF2FF
+  BorderColor #4773B5
+  ArrowColor #54708E
+}
+actor "游客 / 学生 / 管理员" as User
+component "Web 前端\n浏览 / 卖家 / 管理端" as UI
+component "API 网关与鉴权" as Gateway
+component "账号模块" as Auth
+component "商品与审核模块" as Listing
+component "预约模块" as Booking
+component "举报模块" as Report
+component "通知模块" as Notice
+component "统计与日志模块" as Analytics
+component "定时任务" as Scheduler
+database "关系数据库\n用户·商品·预约·举报\n请求回执·消息·日志" as DB
+
+User --> UI
+UI --> Gateway : HTTPS
+Gateway --> Auth
+Gateway --> Listing
+Gateway --> Booking
+Gateway --> Report
+Gateway --> Notice
+Gateway --> Analytics
+Booking --> Listing : 事务内核对商品状态
+Report --> Listing : 原子下架 / 终止预约
+Report --> Booking
+Scheduler --> Booking : 到期失效
+Scheduler --> Notice : 定时提醒
+Listing --> Notice : 审核 / 状态事件
+Booking --> Notice : 预约 / 完成事件
+Report --> Notice : 举报结果事件
+Auth --> DB
+Listing --> DB
+Booking --> DB
+Report --> DB
+Notice --> DB
+Analytics --> DB
+note bottom of DB
+  商品与预约联动在一个数据库事务中完成。
+  站内消息使用事件编号去重，失败可重试。
+end note
+@enduml

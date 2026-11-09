@@ -1,0 +1,32 @@
+@startuml
+!pragma layout smetana
+skinparam dpi 220
+title UML状态图：预约生命周期
+skinparam shadowing false
+skinparam defaultFontName PingFang SC
+skinparam state {
+  BackgroundColor #F1F7FF
+  BorderColor #5174A5
+}
+[*] --> 待卖家确认 : 买家预约
+待卖家确认 --> 已确认 : 卖家确认（24 小时内）
+待卖家确认 --> 卖家拒绝 : 拒绝并选择原因
+待卖家确认 --> 买家取消 : 买家取消
+待卖家确认 --> 超时失效 : 创建满 24 小时
+已确认 --> 已完成 : 买家二次确认收货
+已确认 --> 买家取消 : 买家取消
+已确认 --> 卖家取消 : 卖家取消
+已确认 --> 超时失效 : 确认满 7 天
+待卖家确认 --> 违规终止 : 商品违规下架
+已确认 --> 违规终止 : 商品违规下架
+已完成 --> [*]
+买家取消 --> [*]
+卖家取消 --> [*]
+卖家拒绝 --> [*]
+超时失效 --> [*]
+违规终止 --> [*]
+note right of 已确认
+  仅此时且商品仍为已预约，
+  双方可请求对方联系方式。
+end note
+@enduml

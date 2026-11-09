@@ -1,0 +1,124 @@
+@startuml
+!pragma layout smetana
+skinparam dpi 220
+title UML类图：核心领域对象与关联
+skinparam shadowing false
+skinparam defaultFontName PingFang SC
+skinparam classAttributeIconSize 0
+skinparam class {
+  BackgroundColor #F5F8FE
+  BorderColor #446A9B
+  ArrowColor #546F8C
+}
+hide empty methods
+
+abstract class Account {
+  +id: UUID
+  +createdAt: DateTime
+}
+
+class Student {
+  +schoolEmail: String {unique}
+  +passwordHash: String
+  +verified: Boolean
+  +contact: String
+}
+class Admin {
+  +enabled: Boolean
+}
+class Listing {
+  +id: UUID
+  +sellerId: UUID
+  +title: String
+  +description: Text
+  +category: String
+  +price: Decimal
+  +images: URL[]
+  +status: ListingStatus
+  +version: Integer
+  +auditedBy: UUID?
+  +auditedAt: DateTime?
+  +auditReason: Text?
+  +createdAt: DateTime
+  +updatedAt: DateTime
+}
+class Reservation {
+  +id: UUID
+  +listingId: UUID
+  +buyerId: UUID
+  +priceSnapshot: Decimal
+  +requestId: String
+  +status: ReservationStatus
+  +createdAt: DateTime
+  +confirmedAt: DateTime?
+  +endedAt: DateTime?
+  +endReason: Text?
+}
+class ReportCase {
+  +id: UUID
+  +listingId: UUID
+  +reporterId: UUID
+  +category: String
+  +description: Text
+  +evidenceUrls: URL[]
+  +status: ReportStatus
+  +handledBy: UUID?
+  +handledAt: DateTime?
+  +decisionReason: Text?
+  +mergedIntoId: UUID?
+}
+class RequestReceipt {
+  +accountId: UUID
+  +requestId: String
+  +operation: String
+  +targetId: UUID
+  +requestDigest: String
+  +firstResult: JSON
+  +createdAt: DateTime
+}
+class Notification {
+  +id: UUID
+  +recipientId: UUID
+  +eventId: String {unique per recipient}
+  +kind: String
+  +content: Text
+  +readAt: DateTime?
+}
+class AuditLog {
+  +id: UUID
+  +actorId: UUID?
+  +operation: String
+  +targetId: UUID?
+  +beforeState: String?
+  +afterState: String?
+  +result: String
+  +requestId: String?
+  +reason: Text?
+  +occurredAt: DateTime
+}
+
+Account <|-- Student
+Account <|-- Admin
+Student "1" -- "0..*" Listing : 发布 >
+Student "1" -- "0..*" Reservation : 预约 >
+Student "1" -- "0..*" ReportCase : 举报 >
+Student "1" -- "0..*" Notification : 收到 >
+Listing "1" -- "0..*" Reservation : 历史预约 >
+Listing "1" -- "0..*" ReportCase : 被举报 >
+Admin "0..1" -- "0..*" ReportCase : 处理 >
+Admin "0..1" -- "0..*" Listing : 审核 >
+Account "1" -- "0..*" RequestReceipt : 发起 >
+AuditLog ..> Listing
+AuditLog ..> Reservation
+AuditLog ..> ReportCase
+
+note right of Reservation
+  同一商品最多一条有效预约：
+  待卖家确认或已确认。
+  价格快照在创建时固定。
+end note
+note bottom of RequestReceipt
+  (accountId, requestId) 唯一。
+  摘要不同则编号冲突；相同返回首次结果。
+end note
+@enduml
